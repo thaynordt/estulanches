@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ficha Simplificada de Registro de Mudanca (RDM)</title>
+  <style>
+    @page { size: A4; margin: 12mm; }
+    body { font-family: Arial, sans-serif; color: #111827; font-size: 11.5px; line-height: 1.4; margin: 0; }
+    .header { border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 16px; color: #1e3a8a; margin: 0; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    th, td { border: 1px solid #cbd5e1; padding: 7px 9px; text-align: left; vertical-align: top; }
+    th { background-color: #f1f5f9; color: #1e3a8a; width: 28%; font-weight: bold; }
+    .section-title { background: #1e3a8a; color: #fff; padding: 5px 9px; font-weight: bold; font-size: 12px; margin-bottom: 0; }
+    .badge-ok { color: #065f46; background: #d1fae5; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>FICHA SIMPLIFICADA DE REGISTRO DE MUDANCA (RDM)</h1>
+      <span>Implantacao em Ambiente de Producao — Sistema EstuLanches</span>
+    </div>
+    <div><strong>RDM N:</strong> 2026-001</div>
+  </div>
+
+  <div class="section-title">1. IDENTIFICACAO DA MUDANCA</div>
+  <table>
+    <tr><th>Sistema / Aplicacao</th><td>EstuLanches (Gestao de Cardapio e Pedidos da Cantina Escolar)</td></tr>
+    <tr><th>Versao Implantada</th><td>v1.0.0</td></tr>
+    <tr><th>Data e Horario</th><td>17/11/2026 — 12:35 (BRT)</td></tr>
+    <tr><th>Tecnico Responsavel</th><td>Thaylla Neves, Naiara Alicia e Carolina Jung</td></tr>
+    <tr><th>Ambiente / Arquitetura</th><td>Producao Containerizada (Docker Engine + Docker Compose v2)</td></tr>
+  </table>
+
+  <div class="section-title">2. PARAMETROS E CONFIGURACOES IMPLANTADAS</div>
+  <table>
+    <tr><th>Container Aplicacao</th><td><code>estulanches-app</code> (Imagem Node.js 20 Alpine, usuario nao-root <code>node</code>, porta <code>3000:3000</code>, restart policy <code>unless-stopped</code>).</td></tr>
+    <tr><th>Container Banco de Dados</th><td><code>estulanches-db</code> (Imagem <code>postgres:16-alpine</code>, porta <code>5432:5432</code>, inicializacao via <code>db/init.sql</code>).</td></tr>
+    <tr><th>Persistencia e Rede</th><td>Volume nomeado <code>estulanches_pgdata</code> para dados do PostgreSQL; rede bridge isolada <code>estulanches_net</code>.</td></tr>
+    <tr><th>Variaveis e Seguranca</th><td>Credenciais isoladas em <code>.env</code>; queries SQL parametrizadas; <code>HEALTHCHECK</code> automatico a cada 15s em <code>/health</code>.</td></tr>
+  </table>
+
+  <div class="section-title">3. RESULTADOS DOS TESTES E VALIDACAO DE PRODUCAO</div>
+  <table>
+    <tr><th>Status dos Servicos (<code>docker compose ps</code>)</th><td><span class="badge-ok">APROVADO</span> — Servicos <code>estulanches-app</code> e <code>estulanches-db</code> ativos e saudaveis (<code>Up / healthy</code>).</td></tr>
+    <tr><th>Auditoria de Logs (<code>docker compose logs</code>)</th><td><span class="badge-ok">APROVADO</span> — Zero erros criticos na inicializacao do PostgreSQL e do servidor Express.</td></tr>
+    <tr><th>Testes Unitarios (<code>npm run test:unit</code>)</th><td><span class="badge-ok">6/6 PASSARAM</span> — Calculo de totais, descontos, validacao de entrada e bloqueio de estoque.</td></tr>
+    <tr><th>Testes de Integracao (<code>npm run test:integration</code>)</th><td><span class="badge-ok">4/4 PASSARAM</span> — Healthcheck HTTP 200, listagem do cardapio, gravacao transacional de pedido e rejeicao HTTP 400.</td></tr>
+  </table>
+
+  <div class="section-title">4. STATUS FINAL E PLANO DE CONTINGENCIA</div>
+  <table>
+    <tr><th>Status Final da Implantacao</th><td><span class="badge-ok">CONCLUIDA COM SUCESSO — EM OPERACAO</span></td></tr>
+    <tr><th>Plano de Rollback</th><td>Em caso de falha critica pos-implantacao: executar <code>docker compose down</code> e restaurar snapshot do volume <code>estulanches_pgdata</code>.</td></tr>
+  </table>
+</body>
+</html>
